@@ -8,6 +8,8 @@ import SpecialOffers from './components/SpecialOffers';
 import StoreLocations from './components/StoreLocations';
 import ArticlesSection from './components/ArticlesSection';
 import Footer from './components/Footer';
+import { CartProvider } from './components/CartContext';
+import CartPage from './components/CartPage';
 
 const mockProducts = [
   {
@@ -115,34 +117,38 @@ const mockBoughtBefore = [
 
 function App() {
   return (
-    <Router>
-      <div className="app-root">
+    <CartProvider>
+      <Router>
         <Header />
-        <HeroBanner />
-        <SectionBlock title="Акции" rightLink={{ href: '#', text: 'Все акции' }}>
-          {mockProducts.map((p, i) => (
-            <ProductCard key={i} {...p} />
-          ))}
-        </SectionBlock>
-        <SectionBlock title="Новинки" rightLink={{ href: '#', text: 'Все новинки' }}>
-          {mockNewProducts.map((p, i) => (
-            <ProductCard key={i} {...p} />
-          ))}
-        </SectionBlock>
-        <SectionBlock title="Покупали раньше" rightLink={{ href: '#', text: 'Все покупки' }}>
-          {mockBoughtBefore.map((p, i) => (
-            <ProductCard key={i} {...p} />
-          ))}
-        </SectionBlock>
-        <SpecialOffers />
-        <StoreLocations />
-        <ArticlesSection />
-        <Footer />
-      </div>
-      <Routes>
-        {/* Здесь будут маршруты для других страниц */}
-      </Routes>
-    </Router>
+        <Routes>
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="*" element={
+            <div className="app-root">
+              <HeroBanner />
+              <SectionBlock title="Акции" rightLink={{ href: '#', text: 'Все акции' }}>
+                {mockProducts.map((p, i) => (
+                  <ProductCard key={i} {...p} />
+                ))}
+              </SectionBlock>
+              <SectionBlock title="Новинки" rightLink={{ href: '#', text: 'Все новинки' }}>
+                {mockNewProducts.map((p, i) => (
+                  <ProductCard key={i} {...p} />
+                ))}
+              </SectionBlock>
+              <SectionBlock title="Покупали раньше" rightLink={{ href: '#', text: 'Все покупки' }}>
+                {mockBoughtBefore.map((p, i) => (
+                  <ProductCard key={i} {...p} />
+                ))}
+              </SectionBlock>
+              <SpecialOffers />
+              <StoreLocations />
+              <ArticlesSection />
+              <Footer />
+            </div>
+          } />
+        </Routes>
+      </Router>
+    </CartProvider>
   );
 }
 

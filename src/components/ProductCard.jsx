@@ -6,6 +6,7 @@ import colbasa from '../assets/images/colbasa.png';
 import sausages from '../assets/images/sausages.png';
 import vetchina from '../assets/images/vetchina.png';
 import palka from '../assets/images/palka.png';
+import { useCart } from './CartContext';
 
 const images = {
   'pancakes.png': pancakes,
@@ -17,9 +18,17 @@ const images = {
 };
 
 const ProductCard = ({ image, title, price, oldPrice, discount, isNew, boughtBefore }) => {
-  // image может быть '/assets/images/colbasa.png' или просто 'colbasa.png'
+  const { addToCart, cart } = useCart();
   const imgName = image.split('/').pop();
   const imgSrc = images[imgName] || image;
+  
+  // Проверяем — есть ли товар уже в корзине
+  const inCart = cart.some(item => item.title === title);
+
+  const handleAdd = () => {
+    if (!inCart) addToCart({ image, title, price, oldPrice, discount, isNew, boughtBefore });
+  };
+
   return (
     <div className="product-card">
       {discount && <div className="product-card__discount">{discount}</div>}
@@ -32,7 +41,13 @@ const ProductCard = ({ image, title, price, oldPrice, discount, isNew, boughtBef
           <span className="product-card__price">{price} ₽</span>
           {oldPrice && <span className="product-card__old-price">{oldPrice} ₽</span>}
         </div>
-        <button className="product-card__btn">В корзину</button>
+        <button
+          className={`product-card__btn${inCart ? ' in-cart' : ''}`}
+          onClick={handleAdd}
+          disabled={inCart}
+        >
+          {inCart ? 'В корзине' : 'В корзину'}
+        </button>
       </div>
     </div>
   );

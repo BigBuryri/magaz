@@ -113,6 +113,19 @@
   box-shadow: 0 4px 18px rgba(44, 200, 150, 0.15);
   transform: scale(1.04);
 }
+.product-card__btn.in-cart {
+  background: #ff6b35;
+  color: #fff;
+  border: none;
+  cursor: default;
+  box-shadow: 0 2px 12px rgba(255,112,0,0.08);
+}
+.product-card__btn.in-cart:hover {
+  background: #ff6b35;
+  color: #fff;
+  box-shadow: 0 2px 12px rgba(255,112,0,0.11);
+  transform: scale(1);
+}
 
 @media (max-width: 1024px) {
   .product-card {

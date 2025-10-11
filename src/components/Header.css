@@ -2,6 +2,11 @@
   background: #fff;
   box-shadow: 0 3px 16px rgba(0,0,0,0.07);
   padding: 0 40px; /* Отступы по краям */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
 }
 .header__container-flex {
   display: flex;

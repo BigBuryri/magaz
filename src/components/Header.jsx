@@ -2,9 +2,12 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import "./Header.css";
 import logo from '../assets/images/logo.png';
+import { useCart } from './CartContext';
 
 const Header = () => {
   const navigate = useNavigate();
+  const { getCartCount } = useCart();
+
   return (
     <header className="shop-header">
       <div className="container header__container-flex">
@@ -39,7 +42,7 @@ const Header = () => {
             </div>
             <div className="header__icon-block header__cart" onClick={()=>navigate("/cart") }>
               <svg width="24" height="24" fill="none" stroke="#222" strokeWidth="1.8" viewBox="0 0 24 24"><circle cx="8.5" cy="20.5" r="1.5"/><circle cx="17.5" cy="20.5" r="1.5"/><path d="M4 7L6 19H18L20 7H4Z" /><path d="M9 7V4C9 2.9 9.9 2 11 2H13C14.1 2 15 2.9 15 4V7"/></svg>
-              <span className="header__cart-count">1</span>
+              <span className="header__cart-count">{getCartCount()}</span>
               <div className="header__icon-text">Корзина</div>
             </div>
           </nav>
