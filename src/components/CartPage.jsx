@@ -80,7 +80,9 @@ const CartPage = () => {
       <div className="cart-page-layout">
         <section className="cart-prod-list">
           <div className="cart-breadcrumb">
-            <span className="cart-breadcrumb-link" onClick={() => navigate('/')}>Главная</span> <span>/</span> Корзина
+            <span className="cart-breadcrumb-link" onClick={() => navigate('/')}>Главная</span>
+            <span className="cart-breadcrumb-divider">/</span>
+            <span className="cart-breadcrumb-current">Корзина</span>
           </div>
           <div className="cart-title-row">
             <h1>Корзина</h1>
@@ -89,10 +91,17 @@ const CartPage = () => {
             )}
           </div>
           <div className="cart-actions-head">
-            <div className="cart-checkall" onClick={handleCheckAll} style={{cursor:enabledItems.length?"pointer":"default",opacity:enabledItems.length?1:.5}}>
-              <span className={`cart-checkbox-wrap${allChecked ? ' checked':''}`}><svg width="18" height="18"><rect width="18" height="18" rx="4" fill={allChecked ? '#2db344' : '#e1e1e2'}/>{allChecked && <path d="M5 10.5L8 13.5L13 7.5" stroke="#fff" strokeWidth="2" strokeLinecap="round"/>}</svg></span>
+            <label className="cart-checkall" style={{cursor:enabledItems.length?"pointer":"default",opacity:enabledItems.length?1:.5}}>
+              <input
+                type="checkbox"
+                className="cart-real-checkbox"
+                onChange={handleCheckAll}
+                checked={allChecked}
+                disabled={!enabledItems.length}
+              />
+              <span className="cart-checkbox-span"></span>
               <span>Выбрать всё</span>
-            </div>
+            </label>
             <button className="cart-remove-btn" style={{opacity:selectedItems.length?1:.4}} disabled={!selectedItems.length} onClick={handleRemoveSelected}>Удалить выбранные</button>
           </div>
           <div className="cart-list-section">
@@ -103,17 +112,24 @@ const CartPage = () => {
                 const status = getPriceStatus(idx); // DEMO
                 return (
                   <div className={`cart-item-row${notAvailable(item) ? ' not-available' : ''}`} key={idx}>
-                    <span className={`cart-checkbox-wrap${isChecked(item) ? ' checked':''}`}
-                        onClick={() => handleToggleItem(item)} style={{cursor:notAvailable(item)?'default':'pointer'}}>
-                      <svg width="18" height="18"><rect width="18" height="18" rx="4" fill={isChecked(item) ? '#2db344' : '#e1e1e2'}/>{isChecked(item) && <path d="M5 10.5L8 13.5L13 7.5" stroke="#fff" strokeWidth="2" strokeLinecap="round"/>}</svg>
-                    </span>
+                    <label className={`cart-checkbox-wrap${isChecked(item) ? ' checked':''}`}
+                          style={{cursor:notAvailable(item)?'default':'pointer'}}>
+                      <input
+                        type="checkbox"
+                        className="cart-real-checkbox"
+                        checked={isChecked(item)}
+                        disabled={notAvailable(item)}
+                        onChange={()=>handleToggleItem(item)}
+                      />
+                      <span className="cart-checkbox-span"></span>
+                    </label>
                     <img src={imgSrc} alt={item.title} className="cart-item-img" />
                     <div className="cart-item-content">
                       <div className="cart-item-title">{item.title}</div>
                       <div className="cart-item-price-row">
                         <span className="cart-item-price">{item.price} ₽</span>
                         {item.oldPrice && <span className="cart-item-oldprice">{item.oldPrice} ₽</span>}
-                        {item.discount && <span className="cart-item-discount">-{item.discount}</span>}
+                        {item.discount && <div className="cart-item-discount">{item.discount}</div>}
                       </div>
                       <div className="cart-item-meta">
                         <span className={`cart-item-pricetype ${status}`}>{status === 's-card' ? 'С картой' : 'Обычная'}</span>
@@ -121,9 +137,13 @@ const CartPage = () => {
                       </div>
                     </div>
                     <div className="cart-item-actions">
-                      <button onClick={() => decreaseFromCart(item.title)} className="cart-qty-btn" disabled={item.quantity === 1 || notAvailable(item)}>-</button>
+                      <button onClick={() => decreaseFromCart(item.title)} className="cart-qty-btn" disabled={item.quantity === 1 || notAvailable(item)}>
+                        <svg width="15" height="15" viewBox="0 0 16 16" style={{display:'block',margin:'auto'}}><rect x="3" y="7.05" width="10" height="1.9" rx="0.9" fill={item.quantity === 1 || notAvailable(item)?'#babfc2':'#fff'} /></svg>
+                      </button>
                       <span className="cart-qty-count">{item.quantity}</span>
-                      <button onClick={() => addToCart(item)} className="cart-qty-btn" disabled={notAvailable(item)}>+</button>
+                      <button onClick={() => addToCart(item)} className="cart-qty-btn" disabled={notAvailable(item)}>
+                        <svg width="15" height="15" viewBox="0 0 16 16" style={{display:'block',margin:'auto'}}><rect x="3" y="7.05" width="10" height="1.9" rx="0.9" fill={notAvailable(item)?'#babfc2':'#fff'} /><rect x="7.05" y="3" width="1.9" height="10" rx="0.9" fill={notAvailable(item)?'#babfc2':'#fff'} /></svg>
+                      </button>
                     </div>
                     <div className="cart-item-priceblock">
                       <div className="cart-item-total">{(Number(item.price.replace(',', '.')) * item.quantity).toFixed(2)} ₽</div>
