@@ -10,6 +10,7 @@ import vetchina from '../assets/images/vetchina.png';
 import palka from '../assets/images/palka.png';
 import { useCart } from './CartContext';
 import { useProducts } from './ProductsContext';
+import { useFavorites } from './FavoritesContext';
 import AuthModal from './AuthModal';
 
 const images = {
@@ -25,6 +26,7 @@ const Header = () => {
   const navigate = useNavigate();
   const { getCartCount } = useCart();
   const { searchProducts } = useProducts();
+  const { getFavoritesCount } = useFavorites();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
@@ -214,8 +216,11 @@ const Header = () => {
         </div>
         <div className="header__right">
           <nav className="header__nav-icons">
-            <div className="header__icon-block" onClick={()=>navigate("/favorites") }>
+            <div className="header__icon-block header__favorites" onClick={()=>navigate("/favorites") }>
               <svg width="24" height="24" fill="none" stroke="#222" strokeWidth="1.8" viewBox="0 0 24 24"><path d="M12 21C11.8 21 11.7 21 11.5 20.9C6 16.4 3 13.4 3 9.5C3 6.4 5.4 4 8.5 4C10.1 4 11.6 4.8 12.5 6C13.4 4.8 14.9 4 16.5 4C19.6 4 22 6.4 22 9.5C22 13.4 19 16.4 13.5 20.9C13.3 21 13.2 21 12 21Z" /></svg>
+              {getFavoritesCount() > 0 && (
+                <span className="header__favorites-count">{getFavoritesCount()}</span>
+              )}
               <div className="header__icon-text">Избранное</div>
             </div>
             <div className="header__icon-block" onClick={()=>navigate("/orders") }>

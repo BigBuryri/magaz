@@ -1,0 +1,441 @@
+.favorites-page {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  padding-top: 90px;
+  padding-bottom: 40px;
+}
+
+.favorites-page .container {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 40px;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.favorites-page__breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  color: #666;
+}
+
+.breadcrumb-link {
+  color: #69c651;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.breadcrumb-link:hover {
+  color: #5ab341;
+  text-decoration: underline;
+}
+
+.breadcrumb-separator {
+  color: #999;
+}
+
+.breadcrumb-current {
+  color: #232426;
+  font-weight: 500;
+}
+
+.favorites-page__title {
+  font-size: 36px;
+  font-weight: 800;
+  color: #232426;
+  margin-bottom: 32px;
+}
+
+.favorites-page__layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 32px;
+  align-items: start;
+  width: 100%;
+  max-width: 100%;
+  min-height: 500px;
+  position: relative;
+  overflow: visible;
+}
+
+/* Sidebar с фильтрами */
+.favorites-sidebar {
+  position: sticky;
+  top: 100px;
+  height: fit-content;
+  width: 260px;
+  max-width: 260px;
+  min-width: 260px;
+  z-index: 1;
+  flex-shrink: 0;
+  grid-column: 1;
+}
+
+.filter-block {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.filter-header h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #232426;
+  margin: 0;
+}
+
+.filter-clear {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  color: #ff6b35;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.filter-clear:hover {
+  background: #fff5f2;
+  color: #ff4500;
+}
+
+.filter-section {
+  margin-bottom: 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.filter-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.filter-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #232426;
+  margin-bottom: 16px;
+}
+
+/* Фильтр цены */
+.price-inputs {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.price-input {
+  flex: 1;
+  padding: 10px 12px;
+  border: 2px solid #e8e8e8;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  text-align: center;
+  transition: border-color 0.2s;
+}
+
+.price-input:focus {
+  outline: none;
+  border-color: #69c651;
+}
+
+.price-separator {
+  color: #999;
+  font-weight: 600;
+}
+
+.price-slider {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(to right, #69c651 0%, #69c651 var(--slider-value, 50%), #e8e8e8 var(--slider-value, 50%), #e8e8e8 100%);
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.price-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: white;
+  border: 3px solid #69c651;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s;
+}
+
+.price-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 0 4px 12px rgba(105, 198, 81, 0.3);
+}
+
+.price-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: white;
+  border: 3px solid #69c651;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s;
+}
+
+/* Чекбоксы */
+.filter-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  cursor: pointer;
+  font-size: 15px;
+  color: #232426;
+  transition: color 0.2s;
+  position: relative;
+}
+
+.filter-checkbox:hover {
+  color: #69c651;
+}
+
+.filter-checkbox input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.checkbox-custom {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #d0d0d0;
+  border-radius: 6px;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.filter-checkbox input[type="checkbox"]:checked + .checkbox-custom {
+  background: #69c651;
+  border-color: #69c651;
+}
+
+.filter-checkbox input[type="checkbox"]:checked + .checkbox-custom::after {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 2px;
+  width: 6px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.filter-checkbox:hover .checkbox-custom {
+  border-color: #69c651;
+}
+
+.filter-stock {
+  font-weight: 600;
+}
+
+.filter-apply {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #69c651 0%, #5ab341 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 12px rgba(105, 198, 81, 0.3);
+  margin-top: 24px;
+}
+
+.filter-apply:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(105, 198, 81, 0.4);
+}
+
+.filter-apply:active {
+  transform: translateY(0);
+}
+
+/* Контент */
+.favorites-content {
+  min-height: 400px;
+  width: 100%;
+  max-width: 100%;
+  overflow: visible;
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  grid-column: 2;
+}
+
+.favorites-header {
+  background: white;
+  padding: 20px 24px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  width: 100%;
+}
+
+.favorites-count {
+  font-size: 16px;
+  font-weight: 600;
+  color: #666;
+  margin: 0;
+}
+
+.favorites-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+  width: 100%;
+  justify-items: start;
+  align-items: start;
+  position: relative;
+  overflow: visible;
+}
+
+.favorites-grid .product-card {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  margin: 0;
+  box-sizing: border-box;
+  position: relative;
+  justify-self: stretch;
+  align-self: start;
+}
+
+
+/* Пустое состояние */
+.favorites-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 40px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  text-align: center;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.favorites-empty svg {
+  margin-bottom: 32px;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.favorites-empty h2 {
+  font-size: 32px;
+  font-weight: 800;
+  color: #232426;
+  margin-bottom: 16px;
+}
+
+.favorites-empty p {
+  font-size: 18px;
+  color: #666;
+  margin-bottom: 32px;
+  line-height: 1.6;
+}
+
+.favorites-empty-btn {
+  padding: 14px 32px;
+  background: linear-gradient(135deg, #69c651 0%, #5ab341 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 12px rgba(105, 198, 81, 0.3);
+}
+
+.favorites-empty-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(105, 198, 81, 0.4);
+}
+@media (min-width: 1201px) {
+  .favorites-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+}
+
+@media (max-width: 1200px) and (min-width: 993px) {
+  .favorites-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  }
+}
+
+@media (max-width: 992px) {
+  .favorites-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .favorites-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+  }
+  
+  .favorites-grid .product-card {
+    min-height: 320px;
+  }
+}
+
+@media (max-width: 480px) {
+  .favorites-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  
+  .favorites-grid .product-card {
+    min-height: 280px;
+  }
+}

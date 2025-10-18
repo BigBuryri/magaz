@@ -235,6 +235,29 @@
   font-family: Arial, sans-serif;
   font-weight: 500;
 }
+.header__favorites {
+  position: relative;
+}
+
+.header__favorites-count {
+  position: absolute;
+  top: -6px;
+  right: -12px;
+  background: #ff6b6b;
+  color: #fff;
+  font-size: 13px;
+  border-radius: 50%;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #fff;
+  z-index: 2;
+}
+
 .header__cart {
   position: relative;
 }

@@ -10,8 +10,10 @@ import ArticlesSection from './components/ArticlesSection';
 import Footer from './components/Footer';
 import { CartProvider } from './components/CartContext';
 import { ProductsProvider, useProducts } from './components/ProductsContext';
+import { FavoritesProvider } from './components/FavoritesContext';
 import CartPage from './components/CartPage';
 import SearchPage from './components/SearchPage';
+import FavoritesPage from './components/FavoritesPage';
 
 const HomePage = () => {
   const { getDiscountedProducts, getNewProducts, getBoughtBeforeProducts } = useProducts();
@@ -49,16 +51,19 @@ const HomePage = () => {
 function App() {
   return (
     <ProductsProvider>
-      <CartProvider>
-        <Router>
-          <Header />
-          <Routes>
-            <Route path="/search" element={<SearchPage />} />
-            <Route path="/cart" element={<CartPage />} />
-            <Route path="*" element={<HomePage />} />
-          </Routes>
-        </Router>
-      </CartProvider>
+      <FavoritesProvider>
+        <CartProvider>
+          <Router>
+            <Header />
+            <Routes>
+              <Route path="/search" element={<SearchPage />} />
+              <Route path="/cart" element={<CartPage />} />
+              <Route path="/favorites" element={<FavoritesPage />} />
+              <Route path="*" element={<HomePage />} />
+            </Routes>
+          </Router>
+        </CartProvider>
+      </FavoritesProvider>
     </ProductsProvider>
   );
 }
