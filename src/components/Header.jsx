@@ -2,16 +2,38 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Header.css";
 import logo from '../assets/images/logo.png';
+import pancakes from '../assets/images/pancakes.png';
+import milk1 from '../assets/images/milk1.png';
+import colbasa from '../assets/images/colbasa.png';
+import sausages from '../assets/images/sausages.png';
+import vetchina from '../assets/images/vetchina.png';
+import palka from '../assets/images/palka.png';
 import { useCart } from './CartContext';
+import { useProducts } from './ProductsContext';
 import AuthModal from './AuthModal';
+
+const images = {
+  'pancakes.png': pancakes,
+  'milk1.png': milk1,
+  'colbasa.png': colbasa,
+  'sausages.png': sausages,
+  'vetchina.png': vetchina,
+  'palka.png': palka,
+};
 
 const Header = () => {
   const navigate = useNavigate();
   const { getCartCount } = useCart();
+  const { searchProducts } = useProducts();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchSuggestions, setSearchSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
   const profileMenuRef = useRef(null);
+  const searchRef = useRef(null);
 
   // Загружаем пользователя из localStorage при монтировании
   useEffect(() => {
@@ -27,16 +49,19 @@ const Header = () => {
       if (profileMenuRef.current && !profileMenuRef.current.contains(event.target)) {
         setIsProfileMenuOpen(false);
       }
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setShowSuggestions(false);
+      }
     };
 
-    if (isProfileMenuOpen) {
+    if (isProfileMenuOpen || showSuggestions) {
       document.addEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isProfileMenuOpen]);
+  }, [isProfileMenuOpen, showSuggestions]);
 
   const handleLogin = (userData) => {
     setUser(userData);
@@ -58,6 +83,76 @@ const Header = () => {
     setIsProfileMenuOpen(!isProfileMenuOpen);
   };
 
+  const handleSearch = (e, query = searchQuery) => {
+    if (e) e.preventDefault();
+    const searchTerm = query.trim();
+    if (searchTerm) {
+      navigate(`/search?q=${encodeURIComponent(searchTerm)}`);
+      setSearchQuery('');
+      setShowSuggestions(false);
+      setSelectedSuggestionIndex(-1);
+    }
+  };
+
+  const handleSearchInputChange = (e) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    setSelectedSuggestionIndex(-1);
+    
+    if (value.trim().length > 0) {
+      const results = searchProducts(value);
+      // Ограничиваем подсказки до 5 товаров
+      setSearchSuggestions(results.slice(0, 5));
+      setShowSuggestions(true);
+    } else {
+      setSearchSuggestions([]);
+      setShowSuggestions(false);
+    }
+  };
+
+  const handleSearchKeyDown = (e) => {
+    if (!showSuggestions || searchSuggestions.length === 0) {
+      return;
+    }
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelectedSuggestionIndex(prev => 
+        prev < searchSuggestions.length - 1 ? prev + 1 : prev
+      );
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedSuggestionIndex(prev => prev > 0 ? prev - 1 : -1);
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (selectedSuggestionIndex >= 0) {
+        const selectedProduct = searchSuggestions[selectedSuggestionIndex];
+        handleSearch(null, selectedProduct.title);
+      } else {
+        handleSearch(e);
+      }
+    } else if (e.key === 'Escape') {
+      setShowSuggestions(false);
+      setSelectedSuggestionIndex(-1);
+    }
+  };
+
+  const handleSuggestionClick = (product) => {
+    setSearchQuery(product.title);
+    handleSearch(null, product.title);
+  };
+
+  const highlightMatch = (text, query) => {
+    if (!query.trim()) return text;
+    
+    const regex = new RegExp(`(${query})`, 'gi');
+    const parts = text.split(regex);
+    
+    return parts.map((part, index) => 
+      regex.test(part) ? <strong key={index}>{part}</strong> : part
+    );
+  };
+
   return (
     <header className="shop-header">
       <div className="container header__container-flex">
@@ -73,11 +168,48 @@ const Header = () => {
           </button>
         </div>
         <div className="header__center">
-          <div className="header__search">
-            <input type="text" placeholder="Найти товар"/>
-            <span className="header__search-icon">
-              <svg height="20" width="20" fill="none" stroke="#7AC86A" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            </span>
+          <div className="header__search-wrapper" ref={searchRef}>
+            <form className="header__search" onSubmit={handleSearch}>
+              <input 
+                type="text" 
+                placeholder="Найти товар"
+                value={searchQuery}
+                onChange={handleSearchInputChange}
+                onKeyDown={handleSearchKeyDown}
+                onFocus={() => searchQuery.trim() && setShowSuggestions(true)}
+              />
+              <button type="submit" className="header__search-icon">
+                <svg height="20" width="20" fill="none" stroke="#7AC86A" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              </button>
+            </form>
+            
+            {showSuggestions && searchSuggestions.length > 0 && (
+              <div className="header__search-dropdown">
+                {searchSuggestions.map((product, index) => {
+                  const imgName = product.image.split('/').pop();
+                  const imgSrc = images[imgName] || product.image;
+                  
+                  return (
+                    <div
+                      key={product.id}
+                      className={`search-suggestion ${index === selectedSuggestionIndex ? 'selected' : ''}`}
+                      onClick={() => handleSuggestionClick(product)}
+                      onMouseEnter={() => setSelectedSuggestionIndex(index)}
+                    >
+                      <div className="search-suggestion__image">
+                        <img src={imgSrc} alt={product.title} />
+                      </div>
+                      <div className="search-suggestion__info">
+                        <div className="search-suggestion__title">
+                          {highlightMatch(product.title, searchQuery)}
+                        </div>
+                        <div className="search-suggestion__price">{product.price} ₽</div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
         <div className="header__right">

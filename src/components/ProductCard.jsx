@@ -17,16 +17,16 @@ const images = {
   'palka.png': palka,
 };
 
-const ProductCard = ({ image, title, price, oldPrice, discount, isNew, boughtBefore }) => {
+const ProductCard = ({ id, image, title, price, oldPrice, discount, isNew, boughtBefore }) => {
   const { addToCart, cart } = useCart();
   const imgName = image.split('/').pop();
   const imgSrc = images[imgName] || image;
   
   // Проверяем — есть ли товар уже в корзине
-  const inCart = cart.some(item => item.title === title);
+  const inCart = cart.some(item => item.id === id || item.title === title);
 
   const handleAdd = () => {
-    if (!inCart) addToCart({ image, title, price, oldPrice, discount, isNew, boughtBefore });
+    if (!inCart) addToCart({ id, image, title, price, oldPrice, discount, isNew, boughtBefore });
   };
 
   return (
