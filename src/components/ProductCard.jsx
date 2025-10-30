@@ -46,14 +46,15 @@ const ProductCard = ({ id, image, title, price, oldPrice, discount, isNew, bough
       <button 
         className={`product-card__favorite ${favorite ? 'active' : ''}`}
         onClick={handleFavoriteClick}
-        aria-label="Добавить в избранное"
+        aria-label="Пометить как избранное"
       >
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-          <path 
-            d="M12 21C11.8 21 11.7 21 11.5 20.9C6 16.4 3 13.4 3 9.5C3 6.4 5.4 4 8.5 4C10.1 4 11.6 4.8 12.5 6C13.4 4.8 14.9 4 16.5 4C19.6 4 22 6.4 22 9.5C22 13.4 19 16.4 13.5 20.9C13.3 21 13.2 21 12 21Z"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            fill={favorite ? 'currentColor' : 'none'}
+        <svg width="44" height="44" viewBox="0 0 32 32" fill="none">
+          <path
+            d="M16 28s-7.602-6.112-10.401-9.04C3.246 17.302 2 15.225 2 12.993 2 9.134 6.134 6 9.993 6c2.109 0 4.174 1.008 6.007 2.713C17.833 7.008 19.899 6 22.007 6 25.866 6 30 9.134 30 12.993c0 2.232-1.246 4.309-3.599 6.017C23.602 21.888 16 28 16 28z"
+            fill={favorite ? '#FF6B35' : 'none'}
+            stroke={favorite ? '#fff' : '#FF6B35'}
+            strokeWidth={favorite ? '2.6' : '2'}
+            style={{ filter: 'drop-shadow(0 2px 10px rgba(255,91,53,0.10))' }}
           />
         </svg>
       </button>

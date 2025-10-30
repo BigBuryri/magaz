@@ -1,201 +1,199 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFavorites } from './FavoritesContext';
 import ProductCard from './ProductCard';
+import HeroBanner from './HeroBanner';
 import './FavoritesPage.css';
 
 const FavoritesPage = () => {
   const navigate = useNavigate();
-  const { favorites } = useFavorites();
-  
-  const [priceRange, setPriceRange] = useState([1, 1000]);
-  const [selectedCategories, setSelectedCategories] = useState([]);
-  const [inStockOnly, setInStockOnly] = useState(false);
+  const { favorites, toggleFavorite } = useFavorites();
 
-  // Получаем уникальные категории из избранных товаров
-  const categories = useMemo(() => {
-    const cats = [...new Set(favorites.map(item => item.category))];
-    return cats.filter(Boolean);
-  }, [favorites]);
+  // Состояние фильтров
+  const [priceFrom, setPriceFrom] = useState('');
+  const [priceTo, setPriceTo] = useState('');
+  const [inStock, setInStock] = useState(false);
+  const [appliedFilters, setAppliedFilters] = useState({});
+
+  // Применение фильтров
+  const applyFilters = () => {
+    setAppliedFilters({
+      priceFrom: parseFloat(priceFrom) || 0,
+      priceTo: parseFloat(priceTo) || Infinity,
+      inStock,
+    });
+  };
+
+  // Очистка всех фильтров
+  const clearAllFilters = () => {
+    setPriceFrom('');
+    setPriceTo('');
+    setInStock(false);
+    setAppliedFilters({});
+  };
+
+  // Очистка ценового фильтра
+  const clearPriceFilter = () => {
+    setPriceFrom('');
+    setPriceTo('');
+    setAppliedFilters(prev => ({ ...prev, priceFrom: 0, priceTo: Infinity }));
+  };
 
   // Фильтрация товаров
-  const filteredFavorites = useMemo(() => {
-    return favorites.filter(product => {
-      const price = parseFloat(product.price.replace(',', '.'));
-      
-      // Фильтр по цене
-      if (price < priceRange[0] || price > priceRange[1]) {
-        return false;
-      }
-      
-      // Фильтр по категории
-      if (selectedCategories.length > 0 && !selectedCategories.includes(product.category)) {
-        return false;
-      }
-      
-      // Фильтр "В наличии" (все товары в наличии по умолчанию)
-      if (inStockOnly) {
-        return true;
-      }
-      
-      return true;
-    });
-  }, [favorites, priceRange, selectedCategories, inStockOnly]);
-
-  const handleCategoryToggle = (category) => {
-    setSelectedCategories(prev => {
-      if (prev.includes(category)) {
-        return prev.filter(c => c !== category);
-      } else {
-        return [...prev, category];
-      }
-    });
-  };
-
-  const handleClearFilters = () => {
-    setPriceRange([1, 1000]);
-    setSelectedCategories([]);
-    setInStockOnly(false);
-  };
-
-  const hasActiveFilters = selectedCategories.length > 0 || inStockOnly || 
-    priceRange[0] !== 1 || priceRange[1] !== 1000;
+  const filteredProducts = favorites.filter(product => {
+    const price = parseFloat(product.price?.toString().replace(',', '.'));
+    return (
+      (!appliedFilters.priceFrom || price >= appliedFilters.priceFrom) &&
+      (!appliedFilters.priceTo || price <= appliedFilters.priceTo) &&
+      (appliedFilters.inStock ? true : true)
+    );
+  });
 
   return (
     <div className="favorites-page">
+      <HeroBanner />
       <div className="container">
-        <div className="favorites-page__breadcrumbs">
-          <span onClick={() => navigate('/')} className="breadcrumb-link">Главная</span>
-          <span className="breadcrumb-separator">›</span>
-          <span className="breadcrumb-current">Избранное</span>
+        <div style={{ margin: '0 0 36px 0', position: 'relative', display: 'inline-block' }}>
+          <h2 style={{
+            margin: 0,
+            fontSize: '36px',
+            fontWeight: 900,
+            color: '#1A1D1B',
+            letterSpacing: '-0.03em',
+            lineHeight: 1.2,
+            zIndex: 2,
+            position: 'relative',
+            paddingRight: 15,
+            paddingBottom: 4
+          }}>
+            Избранное
+          </h2>
+          <div style={{
+            position: 'absolute',
+            left: 0,
+            bottom: 0,
+            width: '76%',
+            height: 7,
+            borderRadius: 5,
+            background: 'linear-gradient(90deg, #FF6B35 0%, #FF982F 100%)',
+            opacity: 0.17,
+            zIndex: 1
+          }}></div>
         </div>
-
-        <h1 className="favorites-page__title">Избранное</h1>
-
-        <div className="favorites-page__layout">
-          {/* Sidebar с фильтрами */}
-          <aside className="favorites-sidebar">
-            <div className="filter-block">
-              <div className="filter-header">
-                <h3>Фильтр</h3>
-                {hasActiveFilters && (
-                  <button className="filter-clear" onClick={handleClearFilters}>
-                    Очистить
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                      <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                    </svg>
-                  </button>
-                )}
-              </div>
-
-              {/* Фильтр по цене */}
-              <div className="filter-section">
-                <h4 className="filter-title">Цена</h4>
-                <div className="price-inputs">
-                  <input
-                    type="number"
-                    value={priceRange[0]}
-                    onChange={(e) => setPriceRange([+e.target.value, priceRange[1]])}
-                    className="price-input"
-                    min="1"
-                  />
-                  <span className="price-separator">—</span>
-                  <input
-                    type="number"
-                    value={priceRange[1]}
-                    onChange={(e) => setPriceRange([priceRange[0], +e.target.value])}
-                    className="price-input"
-                    min="1"
-                  />
-                </div>
+        <div style={{ display: 'flex', gap: '32px' }}>
+          {/* SIDEBAR С ФИЛЬТРАМИ */}
+          <div style={{
+            minWidth: 300,
+            background: '#fff',
+            borderRadius: 16,
+            boxShadow: '0 4px 24px rgba(44,200,150,0.07)',
+            border: '1px solid #ececec',
+            padding: 28,
+          }}>
+            <h3 style={{
+              margin: '0 0 24px 0', fontSize: 22, fontWeight: 900, color: '#141414', letterSpacing: '-0.02em'
+            }}>Фильтр</h3>
+            {/* Фильтр цены */}
+            <div style={{ marginBottom: 28 }}>
+              <label style={{ display: 'block', fontSize: 15, color: '#222', fontWeight: 700, marginBottom: 10 }}>
+                Цена
+              </label>
+              <div style={{ display: 'flex', gap: 10, marginBottom: 10 }}>
                 <input
-                  type="range"
-                  min="1"
-                  max="1000"
-                  value={priceRange[1]}
-                  onChange={(e) => setPriceRange([priceRange[0], +e.target.value])}
-                  className="price-slider"
-                  style={{ '--slider-value': `${((priceRange[1] - 1) / (1000 - 1)) * 100}%` }}
+                  type="number"
+                  value={priceFrom}
+                  onChange={e => setPriceFrom(e.target.value)}
+                  placeholder="от"
+                  style={{ flex: 1, padding: 10, borderRadius: 8, background: '#fff', border: '1.7px solid #ececec', boxShadow: 'none', fontSize: 16, color: '#222', fontWeight: 700 }}
+                />
+                <span style={{ color: '#888', fontWeight: 700 }}>—</span>
+                <input
+                  type="number"
+                  value={priceTo}
+                  onChange={e => setPriceTo(e.target.value)}
+                  placeholder="до"
+                  style={{ flex: 1, padding: 10, borderRadius: 8, background: '#fff', border: '1.7px solid #ececec', boxShadow: 'none', fontSize: 16, color: '#222', fontWeight: 700 }}
                 />
               </div>
-
-              {/* Фильтр по категориям */}
-              {categories.length > 0 && (
-                <div className="filter-section">
-                  <h4 className="filter-title">Категории</h4>
-                  {categories.map(category => (
-                    <label key={category} className="filter-checkbox">
-                      <input
-                        type="checkbox"
-                        checked={selectedCategories.includes(category)}
-                        onChange={() => handleCategoryToggle(category)}
-                      />
-                      <span className="checkbox-custom"></span>
-                      <span>{category}</span>
-                    </label>
-                  ))}
-                </div>
-              )}
-
-              {/* В наличии */}
-              <div className="filter-section">
-                <label className="filter-checkbox filter-stock">
-                  <input
-                    type="checkbox"
-                    checked={inStockOnly}
-                    onChange={(e) => setInStockOnly(e.target.checked)}
-                  />
-                  <span className="checkbox-custom"></span>
-                  <span>В наличии</span>
-                </label>
-              </div>
-
-              <button className="filter-apply">Применить</button>
+              <input
+                type="range"
+                min="0"
+                max="1000"
+                value={priceFrom || 0}
+                onChange={e => setPriceFrom(e.target.value)}
+                style={{
+                  width: '100%', height: 9, borderRadius: 6,
+                  background: 'linear-gradient(90deg, #FF6B35 0%, #FFB396 100%)', marginBottom: 0,
+                  accentColor: '#FF6B35'
+                }}
+              />
             </div>
-          </aside>
+            {/* Фильтр наличия */}
+            <div style={{ marginBottom: 26 }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 16, color: '#222', fontWeight: 700 }}>
+                <input
+                  type="checkbox"
+                  checked={inStock}
+                  onChange={() => setInStock(!inStock)}
+                  style={{ width: 22, height: 22, borderRadius: 6, border: '2px solid #ececec', accentColor: '#FF6B35', marginRight: 4 }}
+                />
+                В наличии
+              </label>
+            </div>
+            {/* Кнопки */}
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button
+                onClick={clearAllFilters}
+                style={{
+                  flex: 1, padding: '12px 0', borderRadius: 8, background: '#f7faf6', color: '#222', border: '1.4px solid #e1eede', fontWeight: 700, fontSize: 15, cursor: 'pointer'
+                }}
+              >Очистить</button>
+              <button
+                onClick={applyFilters}
+                style={{
+                  flex: 1, padding: '12px 0', borderRadius: 8, background: '#FF6B35', color: '#fff', border: 'none', fontWeight: 900, fontSize: 16, cursor: 'pointer', boxShadow: '0 4px 18px rgba(255, 107, 53, 0.13)'
+                }}
+              >Применить</button>
+            </div>
+          </div>
 
-          {/* Контент */}
-          <div className="favorites-content">
-            {favorites.length === 0 ? (
-              <div className="favorites-empty">
-                <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
-                  <path d="M60 100C58.5 100 57 99.5 56 98.5C30 75 15 60 15 40C15 25 26 15 40 15C47.5 15 54.5 18.5 60 24C65.5 18.5 72.5 15 80 15C94 15 105 25 105 40C105 60 90 75 64 98.5C63 99.5 61.5 100 60 100Z" stroke="#FFE0E0" strokeWidth="4" fill="#FFF5F5"/>
-                  <line x1="30" y1="90" x2="90" y2="30" stroke="#FFB8B8" strokeWidth="6" strokeLinecap="round"/>
-                </svg>
-                <h2>Список избранного пуст</h2>
-                <p>Добавляйте товары в избранное, нажимая на иконку сердечка</p>
-                <button className="favorites-empty-btn" onClick={() => navigate('/')}>
-                  Перейти к покупкам
+          {/* КОНТЕНТ С ТОВАРАМИ */}
+          <div style={{ flex: 2, minWidth: '800px' }}>
+            {/* Активный фильтр */}
+            {appliedFilters.priceFrom > 0 && (
+              <div style={{
+                display: 'flex', gap: '8px', alignItems: 'center', background: '#e8f5e8', padding: '8px 12px', borderRadius: '4px', marginBottom: '16px',
+              }}>
+                <span>Цена от {appliedFilters.priceFrom} до {appliedFilters.priceTo}</span>
+                <button
+                  onClick={clearPriceFilter}
+                  style={{ background: 'none', border: 'none', color: '#333', cursor: 'pointer', fontSize: '14px' }}
+                >
+                  ×
                 </button>
               </div>
-            ) : filteredFavorites.length === 0 ? (
-              <div className="favorites-empty">
-                <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
-                  <circle cx="60" cy="60" r="40" stroke="#E0E0E0" strokeWidth="4"/>
-                  <line x1="50" y1="50" x2="50" y2="60" stroke="#CCC" strokeWidth="4" strokeLinecap="round"/>
-                  <line x1="70" y1="50" x2="70" y2="60" stroke="#CCC" strokeWidth="4" strokeLinecap="round"/>
-                  <path d="M45 75C45 75 52 70 60 70C68 70 75 75 75 75" stroke="#CCC" strokeWidth="4" strokeLinecap="round"/>
-                </svg>
-                <h2>Ничего не найдено</h2>
-                <p>Попробуйте изменить параметры фильтров</p>
-                <button className="favorites-empty-btn" onClick={handleClearFilters}>
-                  Сбросить фильтры
-                </button>
-              </div>
-            ) : (
-              <>
-                <div className="favorites-header">
-                  <p className="favorites-count">
-                    {filteredFavorites.length} {filteredFavorites.length === 1 ? 'товар' : 'товаров'}
-                  </p>
-                </div>
-                <div className="favorites-grid">
-                  {filteredFavorites.map((product) => (
-                    <ProductCard key={product.id} {...product} />
-                  ))}
-                </div>
-              </>
             )}
+            {/* Сетка товаров */}
+            <div className="favorites-grid">
+              {filteredProducts.length === 0 ? (
+                <p style={{ width: '100%', textAlign: 'center', color: '#999' }}>
+                  Избранное пусто
+                </p>
+              ) : (
+                filteredProducts.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    image={product.image}
+                    price={product.price}
+                    title={product.title}
+                    rating={product.rating}
+                    onAddToCart={() => console.log('В корзину:', product.title)}
+                    onToggleFavorite={() => toggleFavorite(product)}
+                    isFavorite={true}
+                  />
+                ))
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -204,4 +202,3 @@ const FavoritesPage = () => {
 };
 
 export default FavoritesPage;
-
